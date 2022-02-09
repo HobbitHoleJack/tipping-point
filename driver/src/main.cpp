@@ -1,5 +1,5 @@
 #include "main.h"
-
+using namespace okapi;
 /**
  * A callback function for LLEMU's center button.
  *
@@ -74,19 +74,29 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+	
+	// Joystick to read analog values for tank or arcade control.
+// Master controller by default.
+Controller controller;
 
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
+while (true) {
 
-		left_mtr = left;
-		right_mtr = right;
-		pros::delay(20);
+	// Chassis Controller - lets us drive the robot around with open- or closed-loop control
+    std::shared_ptr<ChassisController> drive =
+        ChassisControllerBuilder()
+            .withMotors(
+        	{-14, 10}, // Left motors are 14 & 10
+        	{-4, 20})   // Right motors are 4 & 20
+            // Green gearset, 4 in wheel diam
+            .withDimensions(AbstractMotor::gearset::blue, {{4_in}, imev5GreenTPR})
+            .build();
+
+    // Arcade drive with the left stick.
+    drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
+                              controller.getAnalog(ControllerAnalog::leftX));
+
+    // Wait and give up the time we don't need to other tasks.
+    // joystick values, motor telemetry, etc. all updates every 10 ms.
+    pros::delay(10);
 	}
 }
