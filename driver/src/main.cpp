@@ -1,20 +1,5 @@
 #include "main.h"
 using namespace okapi;
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -22,12 +7,7 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
-}
+void initialize() {}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -74,29 +54,25 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	
-	// Joystick to read analog values for tank or arcade control.
-// Master controller by default.
-Controller controller;
-
-while (true) {
-
-	// Chassis Controller - lets us drive the robot around with open- or closed-loop control
+    // Chassis Controller - lets us drive the robot around with open- or closed-loop control
     std::shared_ptr<ChassisController> drive =
         ChassisControllerBuilder()
-            .withMotors(
-        	{-14, 10}, // Left motors are 14 & 10
-        	{-4, 20})   // Right motors are 4 & 20
-            // Green gearset, 4 in wheel diam
-            .withDimensions(AbstractMotor::gearset::blue, {{4_in}, imev5GreenTPR})
+            .withMotors({-14, 10}, {-4, 20})
+            // Green gearset, 4 in wheel diam, 11.5 in wheel track
+            .withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
             .build();
 
-    // Arcade drive with the left stick.
-    drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
-                              controller.getAnalog(ControllerAnalog::leftX));
+    // Joystick to read analog values for tank or arcade control
+    // Master controller by default
+    Controller controller;
 
-    // Wait and give up the time we don't need to other tasks.
-    // joystick values, motor telemetry, etc. all updates every 10 ms.
-    pros::delay(10);
-	}
+	while (true) {
+
+    	// Arcade drive with the left stick.
+    	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
+                              controller.getAnalog(ControllerAnalog::leftX));
+    	// Wait and give up the time we don't need to other tasks.
+    	// joystick values, motor telemetry, etc. all updates every 10 ms.
+    	pros::delay(10);
+		}
 }
