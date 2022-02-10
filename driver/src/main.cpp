@@ -63,22 +63,38 @@ void opcontrol()
 			.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
 			.build();
 
-	
-
-	// Joystick to read analog values for tank or arcade control
-	// Master controller by default
-	Controller controller;
-
+	pros::Motor arm(8, MOTOR_GEARSET_36, true); // The arm motor has the 100rpm (red) gearset
+	pros::Controller master(CONTROLLER_MASTER);
+	pros::arm.setBrakeMode(MOTOR_BRAKE_HOLD);
 	while (true)
 	{
 
-		// Arcade drive with the left stick.
-		drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
-								  controller.getAnalog(ControllerAnalog::leftX));
+		if (master.get_digital(DIGITAL_L1))
+		{
+			arm.move_velocity(100); // This is 100 because it's a 100rpm motor
+		}
+		else if (master.get_digital(DIGITAL_L2))
+		{
+			arm.move_velocity(-100);
+		}
+		else
+		{
+			arm.move_velocity(0);
+		}
 
+		// Joystick to read analog values for tank or arcade control
+		// Master controller by default
+		Controller controller;
 
-		// Wait and give up the time we don't need to other tasks.
-		// joystick values, motor telemetry, etc. all updates every 10 ms.
-		pros::delay(10);
+		while (true)
+		{
+
+			// Arcade drive with the left stick.
+			drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
+									  controller.getAnalog(ControllerAnalog::leftX));
+
+			// Wait and give up the time we don't need to other tasks.
+			// joystick values, motor telemetry, etc. all updates every 10 ms.
+			pros::delay(10);
+		}
 	}
-}
