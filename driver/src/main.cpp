@@ -53,26 +53,49 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
-    // Chassis Controller - lets us drive the robot around with open- or closed-loop control
-    std::shared_ptr<ChassisController> drive =
-        ChassisControllerBuilder()
-            .withMotors({-14, 10}, {-4, 20})
-            // Green gearset, 4 in wheel diam, 11.5 in wheel track
-            .withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
-            .build();
+void opcontrol()
+{
+	// Chassis Controller - lets us drive the robot around with open- or closed-loop control
+	std::shared_ptr<ChassisController> drive =
+		ChassisControllerBuilder()
+			.withMotors({-14, 10}, {-4, 20})
+			// Green gearset, 4 in wheel diam, 11.5 in wheel track
+			.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
+			.build();
 
-    // Joystick to read analog values for tank or arcade control
-    // Master controller by default
-    Controller controller;
+	ControllerButton armUpButton(ControllerDigital::L1);
+	ControllerButton armDownButton(ControllerDigital::L2);
 
-	while (true) {
+	Motor armMotor(-8);
+	armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
 
-    	// Arcade drive with the left stick.
-    	drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
-                              controller.getAnalog(ControllerAnalog::leftX));
-    	// Wait and give up the time we don't need to other tasks.
-    	// joystick values, motor telemetry, etc. all updates every 10 ms.
-    	pros::delay(10);
-		}
+	ControllerButton clawup(ControllerDigital::R1);
+	ControllerButton clawdown(ControllerDigital::R2);
+	Motor clawMotor(9);
+	 
+
+	ControllerButton clampup(ControllerDigital::right);
+	ControllerButton clampdown(ControllerDigital::Y);
+	Motor clampmotor(19);
+
+	// Joystick to read analog values for tank or arcade control
+	// Master controller by default
+	Controller controller;
+
+	while (true)
+	{
+
+		// Arcade drive with the left stick.
+		drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
+								  controller.getAnalog(ControllerAnalog::leftX));
+
+		if (armUpButton.isPressed()) {armMotor.moveVoltage(12000);} 
+		else if (armDownButton.isPressed()) {armMotor.moveVoltage(-12000);} 
+		else {armMotor.moveVoltage(0);}
+
+
+		// Wait and give up the time we don't need to other tasks.
+		// joystick values, motor telemetry, etc. all updates every 10 ms.
+		pros::delay(10);
+	}
 }
