@@ -72,11 +72,13 @@ void opcontrol()
 	ControllerButton clawup(ControllerDigital::R1);
 	ControllerButton clawdown(ControllerDigital::R2);
 	Motor clawMotor(9);
+	clawMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
 	 
 
 	ControllerButton clampup(ControllerDigital::right);
 	ControllerButton clampdown(ControllerDigital::Y);
 	Motor clampmotor(19);
+	clampmotor.setBrakeMode(AbstractMotor::brakeMode::hold);
 
 	// Joystick to read analog values for tank or arcade control
 	// Master controller by default
@@ -93,6 +95,13 @@ void opcontrol()
 		else if (armDownButton.isPressed()) {armMotor.moveVoltage(-12000);} 
 		else {armMotor.moveVoltage(0);}
 
+		if (clawup.isPressed()) {clawMotor.moveVoltage(12000);} 
+		else if (clawdown.isPressed()) {clawMotor.moveVoltage(-12000);} 
+		else {clawMotor.moveVoltage(0);}
+		
+		if (clampup.isPressed()) {clampmotor.moveVoltage(12000);} 
+		else if (clampdown.isPressed()) {clampmotor.moveVoltage(-12000);} 
+		else {clampmotor.moveVoltage(0);}
 
 		// Wait and give up the time we don't need to other tasks.
 		// joystick values, motor telemetry, etc. all updates every 10 ms.
