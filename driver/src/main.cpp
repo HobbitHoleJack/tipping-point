@@ -62,10 +62,9 @@ void opcontrol()
 			// Green gearset, 4 in wheel diam, 11.5 in wheel track
 			.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
 			.build();
-
 	pros::Motor arm(8, MOTOR_GEARSET_36, true); // The arm motor has the 100rpm (red) gearset
 	pros::Controller master(CONTROLLER_MASTER);
-	pros::arm.setBrakeMode(MOTOR_BRAKE_HOLD);
+	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
 	while (true)
 	{
 
@@ -81,7 +80,7 @@ void opcontrol()
 		{
 			arm.move_velocity(0);
 		}
-
+		
 		// Joystick to read analog values for tank or arcade control
 		// Master controller by default
 		Controller controller;
