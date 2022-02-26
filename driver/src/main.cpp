@@ -1,5 +1,5 @@
 #include "main.h"
-using namespace okapi;
+using namespace pros;
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -7,7 +7,26 @@ using namespace okapi;
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize() {
+	#define Ldrive_1 14 // reverse
+	#define Ldrive_2 10
+	#define Rdrive_1 4 // reverse
+	#define Rdrive_2 20
+
+	#define arm_port 8 // reverse
+	#define clamp_port 9
+	#define blamp_port 19
+
+	Motor drive_left1_initializer (Ldrive_1, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_DEGREES);
+	Motor drive_left2_initializer (Ldrive_2, E_MOTOR_GEARSET_06, false, E_MOTOR_ENCODER_DEGREES);
+
+	Motor drive_right1_initializer (Rdrive_1, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_DEGREES);
+	Motor drive_right2_initializer (Rdrive_2, E_MOTOR_GEARSET_06, false, E_MOTOR_ENCODER_DEGREES);
+
+	Motor arm_initializer (arm_port, E_MOTOR_GEARSET_36, true, E_MOTOR_ENCODER_DEGREES);
+	Motor clamp_initializer (clamp_port, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
+	Motor blamp_initializer (blamp_port, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
+}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -53,47 +72,63 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol()
-{
-	// Chassis Controller - lets us drive the robot around with open- or closed-loop control
-	std::shared_ptr<ChassisController> drive =
-		ChassisControllerBuilder()
-			.withMotors({-14, 10}, {-4, 20})
-			// Green gearset, 4 in wheel diam, 11.5 in wheel track
-			.withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
-			.build();
-	pros::Motor arm(8, MOTOR_GEARSET_36, true); // The arm motor has the 100rpm (red) gearset
-	pros::Controller master(CONTROLLER_MASTER);
-	arm.set_brake_mode(MOTOR_BRAKE_HOLD);
-	while (true)
-	{
+void opcontrol() {
 
-		if (master.get_digital(DIGITAL_L1))
-		{
-			arm.move_velocity(100); // This is 100 because it's a 100rpm motor
+	#define Ldrive_1 14 //reverse
+	#define Ldrive_2 10
+	#define Rdrive_1 4 //reverse
+	#define Rdrive_2 20
+
+	#define arm_port 8 // reverse
+	#define clamp_port 9
+	#define blamp_port 19
+
+	Motor drive_left1 (Ldrive_1);
+	Motor drive_left2 (Ldrive_2);
+	Motor drive_right1 (Rdrive_1);
+	Motor drive_right2 (Rdrive_2);
+
+	Motor arm (arm_port);
+	arm.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+
+	Motor clamp (clamp_port);
+	clamp.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+
+	Motor blamp (blamp_port);
+	blamp.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+
+	Controller master (CONTROLLER_MASTER);
+
+
+	while (true) {
+
+	// drivebase stuff	
+		int power = master.get_analog(ANALOG_LEFT_Y);
+		int turn = master.get_analog(ANALOG_LEFT_X);
+		int left = power + turn;
+		int right = power - turn;
+
+		drive_left1.move(left);
+		drive_left2.move(left);
+		drive_right1.move(right);
+		drive_right2.move(right);
+
+
+	// arm shi
+		if (master.get_digital(DIGITAL_L1)) {
+			arm.move_velocity(100);
 		}
-		else if (master.get_digital(DIGITAL_L2))
-		{
+		else if (master.get_digital(DIGITAL_L2)) {
 			arm.move_velocity(-100);
 		}
-		else
-		{
+		else {
 			arm.move_velocity(0);
 		}
-		
-		// Joystick to read analog values for tank or arcade control
-		// Master controller by default
-		Controller controller;
 
-		while (true)
-		{
-
-			// Arcade drive with the left stick.
-			drive->getModel()->arcade(controller.getAnalog(ControllerAnalog::leftY),
-									  controller.getAnalog(ControllerAnalog::leftX));
+	// clamp and blamp !?+
 
 			// Wait and give up the time we don't need to other tasks.
 			// joystick values, motor telemetry, etc. all updates every 10 ms.
 			pros::delay(10);
-		}
-	}
+}
+}
