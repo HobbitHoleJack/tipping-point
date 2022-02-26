@@ -125,11 +125,26 @@ void opcontrol() {
 			arm.move_velocity(0);
 		}
 
-	// clamp and blamp !?+
+	// clamp and blamp !?
+		if (master.get_digital(DIGITAL_R1)){
+			if (clamp.get_position() <= 200){
+				clamp.move_relative(400, 100);
+			}
+			else {
+				clamp.move_relative(0, 100);
+			}
+		}
+		
+		if (master.get_digital(DIGITAL_R2)){
+			if (blamp.get_position() <= 200){
+				blamp.move_relative(400, 100);
+			}
+			else {
+				blamp.move_relative(0, 100);
+			}
 
-	
 			// Wait and give up the time we don't need to other tasks.
 			// joystick values, motor telemetry, etc. all updates every 10 ms.
 			pros::delay(10);
-}
+				}
 }
