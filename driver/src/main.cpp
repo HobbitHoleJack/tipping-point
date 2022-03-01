@@ -114,9 +114,10 @@ void opcontrol() {
 		drive_right2.move(right);
 
 
-	// arm shi
+	// arm
 		if (master.get_digital(DIGITAL_L1)) {
 			arm.move_velocity(100);
+			// .move_velocity gives us smooth motion while the button is pressed
 		}
 		else if (master.get_digital(DIGITAL_L2)) {
 			arm.move_velocity(-100);
@@ -126,15 +127,17 @@ void opcontrol() {
 		}
 
 	// clamp and blamp !?
+
+		// clamp
 		if (master.get_digital(DIGITAL_R1)){
 			if (clamp.get_position() <= 200){
-				clamp.move_relative(400, 100);
+				clamp.move_relative(500, 100);
 			}
 			else {
-				clamp.move_relative(0, 100);
+				clamp.move_relative(50, 100); // move to a position relative to the 0 position
 			}
 		}
-		
+		// blamp
 		if (master.get_digital(DIGITAL_R2)){
 			if (blamp.get_position() <= 200){
 				blamp.move_relative(400, 100);
@@ -143,8 +146,7 @@ void opcontrol() {
 				blamp.move_relative(0, 100);
 			}
 
-			// Wait and give up the time we don't need to other tasks.
-			// joystick values, motor telemetry, etc. all updates every 10 ms.
-			pros::delay(10);
+			// wait so we don't hog the processer 
+			pros::delay(10); // milliseconds 
 				}
 }
