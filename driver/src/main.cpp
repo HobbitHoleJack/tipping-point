@@ -137,7 +137,7 @@ void opcontrol() {
 				clamp.move_relative(50, 100); // move to a position relative to the 0 position
 			}
 		}
-		// blamp
+		// blamp 😍❤️💕🥰😻💖👉👈
 		if (master.get_digital(DIGITAL_R2)){
 			if (blamp.get_position() <= 200){
 				blamp.move_relative(400, 100);
