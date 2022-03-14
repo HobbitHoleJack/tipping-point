@@ -57,7 +57,21 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+using namespace okapi;
+std::shared_ptr<ChassisController> chassis =
+  ChassisControllerBuilder()
+    .withMotors({14, 10}, {4, 20})
+    // Green gearset, 4 in wheel diam, 11.5 in wheel track
+    .withDimensions(AbstractMotor::gearset::blue, {{4_in, 11.5_in}, imev5GreenTPR})
+    .build();
+
+// Move 1 meter to the first goal
+chassis->moveDistance(.1_m);
+// Turn 90 degrees to face second goal
+chassis->turnAngle(90_deg);
+
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -73,6 +87,7 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+/*	using namespace pros;
 
 	#define Ldrive_1 14 //reverse
 	#define Ldrive_2 10
@@ -149,4 +164,5 @@ void opcontrol() {
 			// wait so we don't hog the processer 
 			pros::delay(10); // milliseconds 
 				}
+			*/
 }
