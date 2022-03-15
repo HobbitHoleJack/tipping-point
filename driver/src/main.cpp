@@ -58,18 +58,7 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-using namespace okapi;
-std::shared_ptr<ChassisController> chassis =
-  ChassisControllerBuilder()
-    .withMotors({14, 10}, {4, 20})
-    // Green gearset, 4 in wheel diam, 11.5 in wheel track
-    .withDimensions(AbstractMotor::gearset::blue, {{4_in, 11.5_in}, imev5GreenTPR})
-    .build();
 
-// Move 1 meter to the first goal
-chassis->moveDistance(.1_m);
-// Turn 90 degrees to face second goal
-chassis->turnAngle(90_deg);
 
 }
 
