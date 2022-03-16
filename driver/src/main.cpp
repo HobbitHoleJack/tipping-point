@@ -76,7 +76,6 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-/*	using namespace pros;
 
 	#define Ldrive_1 14 //reverse
 	#define Ldrive_2 10
@@ -112,10 +111,10 @@ void opcontrol() {
 		int left = power + turn;
 		int right = power - turn;
 
-		drive_left1.move(left);
-		drive_left2.move(left);
-		drive_right1.move(right);
-		drive_right2.move(right);
+		drive_left1.moveVelocity(left);
+		drive_left2.moveVelocity(left);
+		drive_right1.moveVelocity(right);
+		drive_right2.moveVelocity(right);
 
 
 	// arm
@@ -141,7 +140,7 @@ void opcontrol() {
 				clamp.move_relative(50, 100); // move to a position relative to the 0 position
 			}
 		}
-		// blamp 😍❤️💕🥰😻💖👉👈
+		// blamp 😍❤️💕🥰💖
 		if (master.get_digital(DIGITAL_R2)){
 			if (blamp.get_position() <= 200){
 				blamp.move_relative(400, 100);
@@ -153,5 +152,4 @@ void opcontrol() {
 			// wait so we don't hog the processer 
 			pros::delay(10); // milliseconds 
 				}
-			*/
 }
